@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Discussion Hub</h1>
+
+    <!-- Form for Adding a New Thread -->
+    <h2>Add a New Thread</h2>
+    <form method="POST" action="{{ url_for('add_thread') }}">
+        <input type="text" name="title" placeholder="Thread Title" required>
+        <textarea name="content" placeholder="Thread Content" required></textarea>
+        <input type="text" name="author" placeholder="Your Name" required>
+        <button type="submit">Add Thread</button>
+    </form>
+
+    <!-- List of Existing Threads -->
+    <h2>Threads</h2>
+    <ul>
+        {% for thread in threads %}
+            <li>
+                <a href="{{ url_for('thread_view', thread_id=thread.id) }}">
+                    <div class="card">
+                        <div class="card-header">{{ thread.title }}</div>
+                        <div class="card-body">{{ thread.content }}</div>
+                        <p><strong>Author:</strong> {{ thread.author }}</p>
+                        <p><small>Posted on: {{ thread.timestamp.strftime('%Y-%m-%d %H:%M') }}</small></p>
+                    </div>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

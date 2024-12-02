@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ thread.title }} - Discussion Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .reply-form {
+            display: none; /* Hide reply form initially */
+        }
+        .reply-button {
+            cursor: pointer; /* Ensure cursor indicates clickable button */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Thread Title and Content -->
+        <h1>{{ thread.title }}</h1>
+        <p><strong>By:</strong> {{ thread.author }} on {{ thread.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        <p>{{ thread.content }}</p>
+
+        <!-- Comments Section -->
+        <div class="comments-section" id="comments">
+            {% for comment in comments %}
+                <div class="comment-section">
+                    <div class="comment card" id="comment-{{ comment.id }}">
+                        <div class="card-body">
+                            <p><strong>{{ comment.author }}</strong> on {{ comment.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                            <p>{{ comment.content }}</p>
+                            <button class="reply-button" data-comment-id="{{ comment.id }}">Reply</button>
+                            <!-- Reply Form -->
+                            <form id="reply-form-{{ comment.id }}" class="reply-form" action="{{ url_for('reply_to_comment', comment_id=comment.id) }}" method="post">
+                                <input type="text" name="author" placeholder="Your Name" required>
+                                <textarea name="content" placeholder="Reply..." required></textarea>
+                                <button type="submit">Submit Reply</button>
+                            </form>
+                        </div>
+                        <div class="card-footer">
+                            <form method="POST" action="{{ url_for('upvote', comment_id=comment.id) }}">
+                                <button type="submit">
+                                    <i class="fas fa-thumbs-up icon"></i> Upvote ({{ comment.upvotes }})
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Replies Displayed Side by Side -->
+                    <div class="replies-section">
+                        {% for reply in comment.replies %}
+                            <div class="reply card">
+                                <div class="card-body">
+                                    <p><strong>{{ reply.author }}</strong> on {{ reply.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                                    <p>{{ reply.content }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Add a Comment Form -->
+        <div class="new-comment">
+            <h2>Add a Comment</h2>
+            <form action="{{ url_for('add_comment', thread_id=thread.id) }}" method="post">
+                <input type="text" name="author" placeholder="Your Name" required>
+                <textarea name="content" placeholder="Your comment..." required></textarea>
+                <button type="submit">Add Comment</button>
+            </form>
+        </div>
+
+        <!-- Home Button -->
+        <a href="{{ url_for('index') }}" class="home-button">
+            <button>Home</button>
+        </a>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.reply-button').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent default button action
+                    const commentId = button.dataset.commentId;
+                    const replyForm = document.getElementById(`reply-form-${commentId}`);
+                    
+                    // Toggle reply form visibility
+                    replyForm.style.display = (replyForm.style.display === 'none' || replyForm.style.display === '') ? 'block' : 'none';
+                    console.log('Reply button clicked for comment ID:', commentId); // Debug log
+                });
+            });
+        });
+    </script>
+</body>
+</html>

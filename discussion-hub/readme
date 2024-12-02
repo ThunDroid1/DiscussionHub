@@ -1,0 +1,4 @@
+activate virtual environment:
+source .venv/bin/activate
+
+run app using: python app.py 
